@@ -4,7 +4,7 @@ from odoo.exceptions import UserError, ValidationError
 from odoo.tests.common import TransactionCase, tagged
 
 
-@tagged('post_install', '-at_install')
+@tagged('plugins_manajement_asesor', 'at_install', 'post_install')
 class TestPenugasanAsesor(TransactionCase):
     """Unit test validasi rasio, duplikat, dan penguncian penugasan."""
 
@@ -21,19 +21,19 @@ class TestPenugasanAsesor(TransactionCase):
             'name': 'Asesor Test 1',
             'login': 'asesor_test_1',
             'email': 'asesor1@test.com',
-            'groups_id': [(4, cls.group_asesor.id)],
+            'group_ids': [(4, cls.group_asesor.id)],
         })
         cls.asesor_user_2 = cls.env['res.users'].create({
             'name': 'Asesor Test 2',
             'login': 'asesor_test_2',
             'email': 'asesor2@test.com',
-            'groups_id': [(4, cls.group_asesor.id)],
+            'group_ids': [(4, cls.group_asesor.id)],
         })
         cls.asesor_user_3 = cls.env['res.users'].create({
             'name': 'Asesor Test 3',
             'login': 'asesor_test_3',
             'email': 'asesor3@test.com',
-            'groups_id': [(4, cls.group_asesor.id)],
+            'group_ids': [(4, cls.group_asesor.id)],
         })
 
         # Buat partner asesi

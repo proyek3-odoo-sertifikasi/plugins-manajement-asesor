@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from odoo.tests.common import TransactionCase, tagged
 
 
-@tagged('post_install', '-at_install')
+@tagged('plugins_manajement_asesor', 'at_install', 'post_install')
 class TestDistribusiOtomatis(TransactionCase):
     """Unit test distribusi round-robin asesi ke asesor."""
 
@@ -21,7 +21,7 @@ class TestDistribusiOtomatis(TransactionCase):
                 'name': 'Asesor Distrib %d' % i,
                 'login': 'asesor_distrib_%d' % i,
                 'email': 'asesor_distrib_%d@test.com' % i,
-                'groups_id': [(4, cls.group_asesor.id)],
+                'group_ids': [(4, cls.group_asesor.id)],
             })
             cls.asesor_users |= user
 

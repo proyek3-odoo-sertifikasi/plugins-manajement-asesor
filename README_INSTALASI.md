@@ -66,28 +66,36 @@
    - Pastikan menu **LSP → Penugasan Asesor** muncul di navigation bar
    - Pastikan sub-menu **Semua Penugasan** dan **Jadwal Ujian** tersedia
 
-### Install via Command Line
+### Install via Command Line / Docker
 
 ```bash
-# Install modul langsung
-./odoo-bin -d <nama_database> -i lsp_penugasan_asesor --stop-after-init
+# Via Docker (Rekomendasi)
+docker compose exec odoo-web odoo -i plugins_manajement_asesor -d postgres --stop-after-init
 
-# Update modul setelah ada perubahan kode
-./odoo-bin -d <nama_database> -u lsp_penugasan_asesor --stop-after-init
+# Update modul (Docker)
+docker compose exec odoo-web odoo -u plugins_manajement_asesor -d postgres --stop-after-init
+
+# Via CLI Tradisional
+./odoo-bin -d <nama_database> -i plugins_manajement_asesor --stop-after-init
+./odoo-bin -d <nama_database> -u plugins_manajement_asesor --stop-after-init
 ```
 
 ---
 
 ## 🧪 Cara Menjalankan Unit Test
 
-### Via Command Line
+### Menggunakan Docker (Rekomendasi)
 
 ```bash
-# Jalankan semua test modul ini
-./odoo-bin -d <nama_database> -i lsp_penugasan_asesor --test-enable --test-tags lsp_penugasan_asesor --stop-after-init
+# Jalankan semua test modul ini dengan port berbeda (8070) agar tidak bentrok dengan server utama
+docker compose exec odoo-web odoo -d postgres -i plugins_manajement_asesor --test-enable --test-tags plugins_manajement_asesor --http-port=8070 --stop-after-init
+```
 
-# Jalankan test spesifik
-./odoo-bin -d <nama_database> -i lsp_penugasan_asesor --test-enable --test-tags post_install --stop-after-init
+### Via Command Line Tradisional
+
+```bash
+# Jalankan semua test modul ini dengan port berbeda (8070) agar tidak bentrok dengan server utama
+./odoo-bin -d <nama_database> -i plugins_manajement_asesor --test-enable --test-tags plugins_manajement_asesor --http-port=8070 --stop-after-init
 ```
 
 ### Daftar Test yang Tersedia
@@ -193,7 +201,7 @@ Modul ini dirancang untuk bisa berdiri sendiri (FASE 1). Ketika modul LSP lain s
 
 3. Jalankan update modul:
    ```bash
-   ./odoo-bin -d <nama_database> -u lsp_penugasan_asesor --stop-after-init
+   docker compose exec odoo-web odoo -u plugins_manajement_asesor -d postgres --stop-after-init
    ```
 
 ---
@@ -255,11 +263,11 @@ plugins_manajement_asesor/
 # 1. Copy modul ke addons
 cp -r plugins_manajement_asesor /path/to/odoo/addons/
 
-# 2. Install
-./odoo-bin -d mydb -i lsp_penugasan_asesor --stop-after-init
+# 2. Install (Docker)
+docker compose exec odoo-web odoo -i plugins_manajement_asesor -d postgres --stop-after-init
 
-# 3. Jalankan test
-./odoo-bin -d mydb --test-enable --test-tags post_install -i lsp_penugasan_asesor --stop-after-init
+# 3. Jalankan test (Docker) dengan port alternatif 8070
+docker compose exec odoo-web odoo -i plugins_manajement_asesor -d postgres --test-enable --test-tags plugins_manajement_asesor --http-port=8070 --stop-after-init
 
 # 4. Jalankan server
 ./odoo-bin -d mydb
