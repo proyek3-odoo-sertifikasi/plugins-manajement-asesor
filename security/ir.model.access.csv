@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_lsp_penugasan_asesor_admin,lsp.penugasan.asesor admin,model_lsp_penugasan_asesor,plugins_manajement_asesor.group_admin_lsp,1,1,1,1
+access_lsp_penugasan_asesor_asesor,lsp.penugasan.asesor asesor,model_lsp_penugasan_asesor,plugins_manajement_asesor.group_asesor,1,0,0,0
+access_lsp_penugasan_line_admin,lsp.penugasan.line admin,model_lsp_penugasan_line,plugins_manajement_asesor.group_admin_lsp,1,1,1,1
+access_lsp_penugasan_line_asesor,lsp.penugasan.line asesor,model_lsp_penugasan_line,plugins_manajement_asesor.group_asesor,1,0,0,0
+access_lsp_jadwal_ujian_admin,lsp.jadwal.ujian admin,model_lsp_jadwal_ujian,plugins_manajement_asesor.group_admin_lsp,1,1,1,1
+access_lsp_jadwal_ujian_asesor,lsp.jadwal.ujian asesor,model_lsp_jadwal_ujian,plugins_manajement_asesor.group_asesor,1,0,0,0
+access_lsp_wizard_tambah_asesor,lsp.wizard.tambah.asesor,model_lsp_wizard_tambah_asesor,plugins_manajement_asesor.group_admin_lsp,1,1,1,1

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ===================== -->
+    <!-- Form View             -->
+    <!-- ===================== -->
+    <record id="lsp_penugasan_asesor_form" model="ir.ui.view">
+        <field name="name">lsp.penugasan.asesor.form</field>
+        <field name="model">lsp.penugasan.asesor</field>
+        <field name="arch" type="xml">
+            <form string="Penugasan Asesor">
+                <header>
+                    <button name="action_distribusi_otomatis"
+                            string="Distribusi &amp; Validasi Otomatis"
+                            type="object"
+                            class="btn-secondary"
+                            invisible="state == 'dikunci'"
+                            confirm="Distribusi ulang akan menghapus pemetaan asesi yang ada. Lanjutkan?"/>
+                    <button name="action_kunci_penugasan"
+                            string="Kunci Penugasan"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state == 'dikunci' or not is_valid"
+                            confirm="Setelah dikunci, penugasan tidak dapat diubah. Lanjutkan?"/>
+                    <button name="action_buka_kunci"
+                            string="Buka Kunci (Admin)"
+                            type="object"
+                            class="btn-warning"
+                            invisible="state != 'dikunci'"
+                            groups="plugins_manajement_asesor.group_admin_lsp"
+                            confirm="Membuka kunci akan memperbolehkan perubahan pada penugasan. Lanjutkan?"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,dikunci"/>
+                </header>
+                <sheet>
+                    <!-- Alert Banner -->
+                    <div class="alert alert-warning text-center" role="alert"
+                         invisible="is_valid or state != 'draft'">
+                        <strong>⚠️ Jumlah asesor belum mencukupi.</strong>
+                        <span> Tambahkan asesor lagi hingga memenuhi kuota minimal.</span>
+                        <br/>
+                        <span>Dibutuhkan: <field name="jumlah_asesor_dibutuhkan" readonly="1"/> asesor.
+                               Saat ini: <field name="total_asesor" readonly="1"/> asesor.</span>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Informasi Penugasan">
+                            <field name="jadwal_id"
+                                   readonly="state == 'dikunci'"/>
+                            <field name="skema_display"/>
+                            <field name="tanggal_penugasan"
+                                   readonly="state == 'dikunci'"/>
+                        </group>
+                        <group string="Status Kuota">
+                            <field name="is_valid" widget="boolean_toggle" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Daftar Asesor &amp; Asesi" name="asesor_asesi">
+                            <div class="mb-3" invisible="state == 'dikunci'">
+                                <button name="%(plugins_manajement_asesor.lsp_penugasan_action_wizard_tambah_asesor)d"
+                                        string="➕ Tambah Asesor"
+                                        type="action"
+                                        class="btn-primary"
+                                        context="{'default_penugasan_id': id}"/>
+                            </div>
+                            <field name="penugasan_line_ids"
+                                   readonly="state == 'dikunci'">
+                                <list editable="bottom"
+                                      decoration-danger="is_overload == True">
+                                    <field name="asesor_id"
+                                           readonly="parent.state == 'dikunci'"/>
+                                    <field name="asesi_ids" widget="many2many_tags"
+                                           readonly="parent.state == 'dikunci'"/>
+                                    <field name="jumlah_asesi"/>
+                                    <field name="is_overload" column_invisible="1"/>
+                                    <field name="state" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Informasi Jadwal" name="info_jadwal">
+                            <group>
+                                <group>
+                                    <field name="total_asesi" readonly="1"/>
+                                    <field name="jumlah_asesor_dibutuhkan" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="total_asesor" readonly="1"/>
+                                    <field name="is_valid" readonly="1" widget="boolean_toggle"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Catatan" name="notes">
+                            <field name="notes"
+                                   placeholder="Catatan tambahan..."
+                                   readonly="state == 'dikunci'"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ===================== -->
+    <!-- List View             -->
+    <!-- ===================== -->
+    <record id="lsp_penugasan_asesor_tree" model="ir.ui.view">
+        <field name="name">lsp.penugasan.asesor.list</field>
+        <field name="model">lsp.penugasan.asesor</field>
+        <field name="arch" type="xml">
+            <list string="Penugasan Asesor"
+                  decoration-danger="not is_valid and state == 'draft'"
+                  decoration-success="state == 'dikunci'">
+                <field name="name"/>
+                <field name="jadwal_id"/>
+                <field name="total_asesor"/>
+                <field name="jumlah_asesor_dibutuhkan"/>
+                <field name="total_asesi"/>
+                <field name="is_valid" column_invisible="1"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-success="state == 'dikunci'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ===================== -->
+    <!-- Search View           -->
+    <!-- ===================== -->
+    <record id="lsp_penugasan_asesor_search" model="ir.ui.view">
+        <field name="name">lsp.penugasan.asesor.search</field>
+        <field name="model">lsp.penugasan.asesor</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="jadwal_id"/>
+            </search>
+        </field>
+    </record>
+
+</odoo>

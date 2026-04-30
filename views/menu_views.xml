@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ===================== -->
+    <!-- Menu Definitions      -->
+    <!-- ===================== -->
+
+    <!-- Top Menu: LSP -->
+    <menuitem
+        id="lsp_penugasan_menu_root"
+        name="LSP"
+        sequence="100"
+    />
+
+    <!-- Menu Group: Penugasan Asesor -->
+    <menuitem
+        id="lsp_penugasan_menu_group"
+        name="Penugasan Asesor"
+        parent="lsp_penugasan_menu_root"
+        sequence="10"
+    />
+
+    <!-- Action: Semua Penugasan -->
+    <record id="lsp_penugasan_action_penugasan" model="ir.actions.act_window">
+        <field name="name">Semua Penugasan</field>
+        <field name="res_model">lsp.penugasan.asesor</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Belum ada penugasan asesor.
+            </p>
+            <p>
+                Buat penugasan baru dari menu Jadwal Ujian.
+            </p>
+        </field>
+    </record>
+
+    <menuitem
+        id="lsp_penugasan_menu_semua_penugasan"
+        name="Semua Penugasan"
+        parent="lsp_penugasan_menu_group"
+        action="lsp_penugasan_action_penugasan"
+        sequence="10"
+    />
+
+    <!-- Action: Jadwal Ujian -->
+    <record id="lsp_penugasan_action_jadwal_ujian" model="ir.actions.act_window">
+        <field name="name">Jadwal Ujian</field>
+        <field name="res_model">lsp.jadwal.ujian</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Belum ada jadwal ujian.
+            </p>
+            <p>
+                Buat jadwal ujian baru untuk memulai proses penugasan asesor.
+            </p>
+        </field>
+    </record>
+
+    <menuitem
+        id="lsp_penugasan_menu_jadwal_ujian"
+        name="Jadwal Ujian"
+        parent="lsp_penugasan_menu_group"
+        action="lsp_penugasan_action_jadwal_ujian"
+        sequence="20"
+    />
+
+</odoo>

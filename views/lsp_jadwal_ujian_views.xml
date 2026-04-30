@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ===================== -->
+    <!-- Form View             -->
+    <!-- ===================== -->
+    <record id="lsp_penugasan_jadwal_ujian_form" model="ir.ui.view">
+        <field name="name">lsp.jadwal.ujian.form</field>
+        <field name="model">lsp.jadwal.ujian</field>
+        <field name="arch" type="xml">
+            <form string="Jadwal Ujian">
+                <header>
+                    <button name="action_mulai_penugasan"
+                            string="Mulai Penugasan Asesor"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state != 'terjadwal'"
+                            confirm="Apakah Anda yakin ingin memulai proses penugasan asesor untuk jadwal ini?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,terjadwal,penugasan,berlangsung,selesai"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Nama/Kode Jadwal"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Informasi Jadwal">
+                            <field name="skema_id"/>
+                            <field name="tanggal_mulai"/>
+                            <field name="tanggal_selesai"/>
+                            <field name="ruangan"/>
+                        </group>
+                        <group string="Statistik">
+                            <field name="jumlah_asesi"/>
+                            <field name="jumlah_asesor_dibutuhkan"/>
+                            <field name="jumlah_asesor_tersedia"/>
+                            <field name="is_kuota_cukup" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Daftar Asesi" name="asesi">
+                            <field name="asesi_ids" widget="many2many_tags"/>
+                        </page>
+                        <page string="Penugasan" name="penugasan">
+                            <field name="penugasan_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="tanggal_penugasan"/>
+                                    <field name="total_asesor"/>
+                                    <field name="total_asesi"/>
+                                    <field name="state" widget="badge"
+                                           decoration-info="state == 'draft'"
+                                           decoration-success="state == 'dikunci'"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ===================== -->
+    <!-- List View             -->
+    <!-- ===================== -->
+    <record id="lsp_penugasan_jadwal_ujian_tree" model="ir.ui.view">
+        <field name="name">lsp.jadwal.ujian.list</field>
+        <field name="model">lsp.jadwal.ujian</field>
+        <field name="arch" type="xml">
+            <list string="Jadwal Ujian">
+                <field name="name"/>
+                <field name="skema_id"/>
+                <field name="tanggal_mulai"/>
+                <field name="tanggal_selesai"/>
+                <field name="ruangan"/>
+                <field name="jumlah_asesi"/>
+                <field name="jumlah_asesor_dibutuhkan"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'terjadwal'"
+                       decoration-primary="state == 'penugasan'"
+                       decoration-success="state == 'selesai'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ===================== -->
+    <!-- Search View           -->
+    <!-- ===================== -->
+    <record id="lsp_penugasan_jadwal_ujian_search" model="ir.ui.view">
+        <field name="name">lsp.jadwal.ujian.search</field>
+        <field name="model">lsp.jadwal.ujian</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+
+</odoo>

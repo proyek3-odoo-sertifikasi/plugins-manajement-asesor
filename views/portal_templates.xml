@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ================================================ -->
+    <!-- Portal: Extend Home for Penugasan Counter        -->
+    <!-- ================================================ -->
+    <template id="portal_my_home_penugasan" name="Portal My Home: Penugasan"
+              inherit_id="portal.portal_my_home" priority="40">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="icon" t-value="'/plugins_manajement_asesor/static/description/icon.png'"/>
+                <t t-set="title">Penugasan Asesor</t>
+                <t t-set="url" t-value="'/my/penugasan'"/>
+                <t t-set="text">Lihat penugasan asesor Anda</t>
+                <t t-set="placeholder_count" t-value="'penugasan_count'"/>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- ================================================ -->
+    <!-- Portal: Daftar Penugasan                         -->
+    <!-- ================================================ -->
+    <template id="portal_my_penugasan_list" name="Portal Daftar Penugasan">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Penugasan Asesor</t>
+            </t>
+
+            <t t-if="not penugasan_list">
+                <div class="alert alert-info text-center" role="alert">
+                    <p class="mb-0">Belum ada penugasan yang ditugaskan kepada Anda.</p>
+                </div>
+            </t>
+
+            <t t-if="penugasan_list">
+                <div class="table-responsive">
+                    <table class="table table-hover o_portal_my_doc_table">
+                        <thead>
+                            <tr class="active">
+                                <th>Kode Penugasan</th>
+                                <th>Jadwal Ujian</th>
+                                <th>Tanggal Penugasan</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="penugasan_list" t-as="penugasan">
+                                <tr>
+                                    <td>
+                                        <a t-attf-href="/my/penugasan/#{penugasan.id}">
+                                            <t t-esc="penugasan.name"/>
+                                        </a>
+                                    </td>
+                                    <td><t t-esc="penugasan.jadwal_id.name"/></td>
+                                    <td><t t-esc="penugasan.tanggal_penugasan" t-options="{'widget': 'date'}"/></td>
+                                    <td>
+                                        <span t-if="penugasan.state == 'draft'"
+                                              class="badge rounded-pill text-bg-info">Draft</span>
+                                        <span t-if="penugasan.state == 'dikunci'"
+                                              class="badge rounded-pill text-bg-success">Dikunci</span>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div t-if="pager" class="o_portal_pager text-center">
+                    <t t-call="portal.pager"/>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- ================================================ -->
+    <!-- Portal: Detail Penugasan                         -->
+    <!-- ================================================ -->
+    <template id="portal_my_penugasan_detail" name="Portal Detail Penugasan">
+        <t t-call="portal.portal_layout">
+            <t t-set="o_portal_fullwidth_alert" groups="plugins_manajement_asesor.group_admin_lsp">
+                <t t-call="portal.portal_back_in_edit_mode">
+                    <t t-set="backend_url" t-value="'/web#model=lsp.penugasan.asesor&amp;id=%s&amp;view_type=form' % (penugasan.id)"/>
+                </t>
+            </t>
+
+            <div class="container mt-4">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <a href="/my/penugasan" class="btn btn-secondary btn-sm">
+                            ← Kembali ke Daftar Penugasan
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        <h3>
+                            <t t-esc="penugasan.name"/>
+                            <span t-if="penugasan.state == 'draft'"
+                                  class="badge rounded-pill text-bg-info ms-2">Draft</span>
+                            <span t-if="penugasan.state == 'dikunci'"
+                                  class="badge rounded-pill text-bg-success ms-2">Dikunci</span>
+                        </h3>
+                    </div>
+                </div>
+
+                <!-- Informasi Jadwal -->
+                <div class="row mt-3">
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Informasi Jadwal</h5>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-sm table-borderless">
+                                    <tr>
+                                        <td class="fw-bold" style="width: 40%;">Jadwal Ujian</td>
+                                        <td><t t-esc="penugasan.jadwal_id.name"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Skema Sertifikasi</td>
+                                        <td><t t-esc="penugasan.skema_display or '-'"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Tanggal Mulai</td>
+                                        <td><t t-esc="penugasan.jadwal_id.tanggal_mulai" t-options="{'widget': 'datetime'}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Tanggal Selesai</td>
+                                        <td><t t-esc="penugasan.jadwal_id.tanggal_selesai" t-options="{'widget': 'datetime'}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Ruangan</td>
+                                        <td><t t-esc="penugasan.jadwal_id.ruangan or '-'"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Tanggal Penugasan</td>
+                                        <td><t t-esc="penugasan.tanggal_penugasan" t-options="{'widget': 'date'}"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Daftar Asesi -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Daftar Asesi yang Ditugaskan kepada Anda</h5>
+                            </div>
+                            <div class="card-body">
+                                <t t-if="not my_asesi">
+                                    <div class="alert alert-info text-center">
+                                        Belum ada asesi yang ditugaskan.
+                                    </div>
+                                </t>
+                                <t t-if="my_asesi">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr class="active">
+                                                    <th style="width: 5%;">No.</th>
+                                                    <th>Nama Asesi</th>
+                                                    <th>Email</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-foreach="my_asesi" t-as="asesi">
+                                                    <tr>
+                                                        <td><t t-esc="asesi_index + 1"/></td>
+                                                        <td><t t-esc="asesi.name"/></td>
+                                                        <td><t t-esc="asesi.email or '-'"/></td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <p class="text-muted mt-2">
+                                        Total asesi: <strong><t t-esc="len(my_asesi)"/></strong>
+                                    </p>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>

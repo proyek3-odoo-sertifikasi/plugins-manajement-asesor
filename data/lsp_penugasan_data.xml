@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ===================== -->
+    <!-- Sequence              -->
+    <!-- ===================== -->
+    <record id="seq_lsp_penugasan" model="ir.sequence">
+        <field name="name">Penugasan Asesor LSP</field>
+        <field name="code">lsp.penugasan.asesor</field>
+        <field name="prefix">PENUGASAN/%(year)s/%(month)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <!-- ===================== -->
+    <!-- Mail Template         -->
+    <!-- ===================== -->
+    <record id="lsp_penugasan_email_template" model="mail.template">
+        <field name="name">Notifikasi Penugasan Asesor LSP</field>
+        <field name="model_id" ref="model_lsp_penugasan_asesor"/>
+        <field name="subject">[LSP] Penugasan Asesor: {{ object.jadwal_id.name }}</field>
+        <field name="auto_delete" eval="False"/>
+        <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px; font-size: 14px;">
+    <table border="0" cellpadding="0" cellspacing="0" style="padding-top: 16px; background-color: #F1F1F1; color: #454748; width: 100%; border-collapse: separate;">
+        <tr>
+            <td align="center">
+                <table border="0" cellpadding="0" cellspacing="0" width="590" style="padding: 16px; background-color: white; color: #454748; border-collapse: separate;">
+                    <tbody>
+                        <tr>
+                            <td align="center" style="min-width: 590px;">
+                                <table border="0" cellpadding="0" cellspacing="0" width="590" style="min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse: separate;">
+                                    <tr>
+                                        <td valign="middle">
+                                            <h2 style="color: #875A7B;">Notifikasi Penugasan Asesor</h2>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="center" style="min-width: 590px;">
+                                <table border="0" cellpadding="0" cellspacing="0" width="590" style="min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse: separate;">
+                                    <tr>
+                                        <td valign="top" style="font-size: 13px;">
+                                            <p>Yth. Asesor,</p>
+                                            <p>Anda telah ditugaskan sebagai Asesor pada ujian sertifikasi berikut:</p>
+
+                                            <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%; margin: 16px 0;">
+                                                <tr style="background-color: #875A7B; color: white;">
+                                                    <td><strong>Informasi</strong></td>
+                                                    <td><strong>Detail</strong></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Kode Penugasan</strong></td>
+                                                    <td>{{ object.name }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Jadwal Ujian</strong></td>
+                                                    <td>{{ object.jadwal_id.name }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Skema Sertifikasi</strong></td>
+                                                    <td>{{ object.skema_display or '-' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Tanggal Mulai</strong></td>
+                                                    <td>{{ object.jadwal_id.tanggal_mulai }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Tanggal Selesai</strong></td>
+                                                    <td>{{ object.jadwal_id.tanggal_selesai }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Ruangan</strong></td>
+                                                    <td>{{ object.jadwal_id.ruangan or '-' }}</td>
+                                                </tr>
+                                            </table>
+
+                                            <p>Silakan cek detail penugasan Anda melalui portal:</p>
+                                            <p style="text-align: center; margin: 16px 0;">
+                                                <a href="/my/penugasan/{{ object.id }}"
+                                                   style="background-color: #875A7B; padding: 10px 20px; text-decoration: none; color: #fff; border-radius: 5px; font-size: 14px;">
+                                                    Lihat Penugasan Saya
+                                                </a>
+                                            </p>
+
+                                            <p>Terima kasih,<br/>Admin LSP</p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
+        </field>
+    </record>
+
+</odoo>

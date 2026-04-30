@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================= -->
+    <!-- List View Penugasan Line (embedded di form)   -->
+    <!-- ============================================= -->
+    <record id="lsp_penugasan_line_tree" model="ir.ui.view">
+        <field name="name">lsp.penugasan.line.list</field>
+        <field name="model">lsp.penugasan.line</field>
+        <field name="arch" type="xml">
+            <list string="Detail Penugasan Asesor"
+                  editable="bottom"
+                  decoration-danger="is_overload == True">
+                <field name="asesor_id"
+                       readonly="state == 'dikunci'"/>
+                <field name="asesi_ids" widget="many2many_tags"
+                       readonly="state == 'dikunci'"/>
+                <field name="jumlah_asesi"/>
+                <field name="is_overload" column_invisible="1"/>
+                <field name="state" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ============================================= -->
+    <!-- Form View Penugasan Line (standalone)         -->
+    <!-- ============================================= -->
+    <record id="lsp_penugasan_line_form" model="ir.ui.view">
+        <field name="name">lsp.penugasan.line.form</field>
+        <field name="model">lsp.penugasan.line</field>
+        <field name="arch" type="xml">
+            <form string="Detail Penugasan">
+                <sheet>
+                    <group>
+                        <group string="Informasi Asesor">
+                            <field name="penugasan_id" readonly="1"/>
+                            <field name="asesor_id"
+                                   readonly="state == 'dikunci'"/>
+                            <field name="asesor_partner_id"/>
+                        </group>
+                        <group string="Statistik">
+                            <field name="jumlah_asesi"/>
+                            <field name="is_overload" widget="boolean_toggle"/>
+                            <field name="state" invisible="1"/>
+                        </group>
+                    </group>
+                    <separator string="Daftar Asesi yang Ditugaskan"/>
+                    <field name="asesi_ids" widget="many2many_tags"
+                           readonly="state == 'dikunci'"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</odoo>
