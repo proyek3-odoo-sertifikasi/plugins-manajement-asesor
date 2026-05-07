@@ -1,5 +1,4 @@
-from odoo import api, fields, models
-from odoo.tools.translate import _
+from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
 
@@ -18,8 +17,8 @@ class LspPenugasanLine(models.Model):
         string='Asesor',
         required=True,
         ondelete='restrict',
-        domain=lambda self: [('groups_id', 'in', [self.env.ref('plugins_manajement_asesor.group_asesor', raise_if_not_found=False).id or 0])],
     )
+    
     asesor_partner_id = fields.Many2one(
         comodel_name='res.partner',
         string='Partner Asesor',

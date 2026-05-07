@@ -173,13 +173,15 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <t t-foreach="my_asesi" t-as="asesi">
-                                                    <tr>
-                                                        <td><t t-esc="asesi_index + 1"/></td>
-                                                        <td><t t-esc="asesi.name"/></td>
-                                                        <td><t t-esc="asesi.email or '-'"/></td>
-                                                    </tr>
-                                                </t>
+                                                                <t t-set="i" t-value="0"/>
+                                                                <t t-foreach="my_asesi" t-as="asesi">
+                                                                    <t t-set="i" t-value="i+1"/>
+                                                                    <tr>
+                                                                        <td><t t-esc="i"/></td>
+                                                                        <td><t t-esc="asesi.name"/></td>
+                                                                        <td><t t-esc="asesi.email or '-'"/></td>
+                                                                    </tr>
+                                                                </t>
                                             </tbody>
                                         </table>
                                     </div>
