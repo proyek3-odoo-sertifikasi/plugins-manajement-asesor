@@ -5,7 +5,7 @@
 
 ## 🎯 KONTEKS PROYEK
 
-Kamu adalah senior Odoo developer yang bertugas membangun **Modul Custom Penugasan Asesor** untuk sistem Lembaga Sertifikasi Profesi (LSP) berbasis Odoo 19. Sistem ini digunakan oleh SMK yang bertindak sebagai penyelenggara sertifikasi kompetensi berstandar BNSP (Badan Nasional Sertifikasi Profesi).
+Kamu adalah senior Odoo developer yang bertugas membangun **Modul Custom Penugasan Asesor** untuk sistem Lembaga Sertifikasi Profesi (LSP) berbasis **Odoo 19 (versi terbaru)**. Sistem ini digunakan oleh SMK yang bertindak sebagai penyelenggara sertifikasi kompetensi berstandar BNSP (Badan Nasional Sertifikasi Profesi).
 
 Modul ini adalah bagian dari ekosistem 6 modul custom LSP. Modul ini bergantung pada data jadwal ujian dan data asesi terdaftar yang sudah ada di sistem.
 
@@ -13,7 +13,7 @@ Modul ini adalah bagian dari ekosistem 6 modul custom LSP. Modul ini bergantung 
 
 ## 📋 DESKRIPSI MODUL
 
-**Nama Modul:** `lsp_penugasan_asesor`
+**Nama Modul:** `plugins_manajement_asesor`
 **Tujuan:** Mengelola pemetaan tanggung jawab penilaian antara Asesor (penguji) dengan Asesi (peserta ujian) secara otomatis, dengan validasi rasio kuota **maksimal 1 Asesor untuk 10 Asesi** dalam satu jadwal ujian.
 
 ---
@@ -82,20 +82,26 @@ Implementasi harus mengikuti alur berikut secara ketat:
 
 Buat struktur direktori persis seperti berikut. **Jangan ada file yang hilang.**
 
+> ⚠️ **Odoo 19 tidak lagi menggunakan folder `static/src/js` dengan widget lama. Gunakan OWL (Owl Component Framework) untuk semua komponen JS custom. Pastikan semua aset JS/CSS didaftarkan via `assets` di `__manifest__.py`, bukan via `web.assets_backend` di XML.**
+
 ```
-lsp_penugasan_asesor/
+plugins_manajement_asesor/
 ├── __init__.py
 ├── __manifest__.py
+├── konteks.md                            # Dokumentasi konteks modul (referensi internal tim)
+├── README_INSTALASI.md                   # Panduan instalasi & konfigurasi
+├── README.md                             # Dokumentasi umum modul
+├── .gitkeep
 │
 ├── models/
 │   ├── __init__.py
-│   ├── lsp_jadwal_ujian.py          # Model jadwal ujian (inherit/extend jika sudah ada, atau buat baru)
-│   ├── lsp_penugasan_asesor.py      # Model utama penugasan (header)
-│   └── lsp_penugasan_line.py        # Model detail baris penugasan (Asesor ↔ Asesi)
+│   ├── lsp_jadwal_ujian.py               # Model jadwal ujian (inherit/extend jika sudah ada, atau buat baru)
+│   ├── lsp_penugasan_asesor.py           # Model utama penugasan (header)
+│   └── lsp_penugasan_line.py             # Model detail baris penugasan (Asesor ↔ Asesi)
 │
 ├── wizards/
 │   ├── __init__.py
-│   └── wizard_tambah_asesor.py      # Wizard untuk Admin menambah Asesor ke jadwal
+│   └── wizard_tambah_asesor.py           # Wizard untuk Admin menambah Asesor ke jadwal
 │
 ├── views/
 │   ├── lsp_penugasan_asesor_views.xml    # Form, list, search view penugasan
@@ -107,10 +113,10 @@ lsp_penugasan_asesor/
 │
 ├── security/
 │   ├── ir.model.access.csv               # Hak akses model
-│   └── lsp_penugasan_security.xml        # Record rules (siapa bisa lihat apa)
+│   └── lsp_penugasan_security.xml        # Record rules & group definition
 │
 ├── data/
-│   └── lsp_penugasan_data.xml            # Mail template & data master awal
+│   └── lsp_penugasan_data.xml            # Mail template, sequence & data master awal
 │
 ├── controllers/
 │   ├── __init__.py
@@ -122,7 +128,7 @@ lsp_penugasan_asesor/
 │
 └── tests/
     ├── __init__.py
-    ├── test_penugasan_asesor.py           # Unit test validasi rasio
+    ├── test_penugasan_asesor.py           # Unit test validasi rasio 1:10
     └── test_distribusi_otomatis.py        # Unit test distribusi round-robin
 ```
 
@@ -165,10 +171,12 @@ lsp_penugasan_asesor/
         'views/wizard_tambah_asesor_views.xml',
         'views/portal_templates.xml',
     ],
+    # Odoo 19: tidak ada lagi 'qweb' key terpisah, semua template masuk ke 'data'
     'installable': True,
     'application': False,
     'auto_install': False,
     'license': 'LGPL-3',
+    # Odoo 19: tambahkan cloc_exclude jika ada file yang tidak perlu dihitung
 }
 ```
 
@@ -215,6 +223,8 @@ Model name : lsp.penugasan.asesor
 _inherit   : ['mail.thread', 'mail.activity.mixin']  # WAJIB untuk notifikasi & chatter
 ```
 
+> ⚠️ **Odoo 19**: Import menggunakan `from odoo import api, fields, models, _` — tidak ada perubahan di sini, tetapi pastikan menggunakan `fields.Html` jika perlu rich text, bukan `fields.Text` dengan widget html lama.
+
 **Fields wajib:**
 - `name`: Char, auto-generate sequence format `PENUGASAN/YYYY/MM/XXX`, `copy=False`
 - `jadwal_id`: Many2one `lsp.jadwal.ujian`, required, `ondelete='restrict'`, `tracking=True`
@@ -247,7 +257,7 @@ _inherit   : ['mail.thread', 'mail.activity.mixin']  # WAJIB untuk notifikasi & 
 - `self.message_post()` dengan body: "Penugasan dikunci oleh {user} pada {datetime}"
 
 `action_buka_kunci(self)`:
-- Hanya bisa dipanggil oleh group `lsp_penugasan_asesor.group_admin_lsp`
+- Hanya bisa dipanggil oleh group `plugins_manajement_asesor.group_admin_lsp`
 - Set `state = 'draft'`
 - `self.message_post()` log pembukaan kunci
 
@@ -341,18 +351,18 @@ Buat view lengkap di dalam tag `<odoo>`:
 
 **Form View `lsp.penugasan.asesor`:**
 - `<header>` dengan `<field name="state" widget="statusbar" statusbar_visible="draft,dikunci"/>`
-- Tombol `Distribusi & Validasi Otomatis`: `invisible="state == 'dikunci'"`, `type="object"`, method `action_distribusi_otomatis`
+- Tombol `Distribusi & Validasi Otomatis`: gunakan `invisible="state == 'dikunci'"` (**Odoo 19: `attrs` sudah DEPRECATED, gunakan ekspresi Python inline langsung di atribut `invisible`, `readonly`, `required`**), `type="object"`, method `action_distribusi_otomatis`
 - Tombol `Kunci Penugasan`: `invisible="state == 'dikunci' or not is_valid"`, type `object`, method `action_kunci_penugasan`, class `btn-primary`
-- Tombol `Buka Kunci (Admin)`: `invisible="state != 'dikunci'"`, `groups="lsp_penugasan_asesor.group_admin_lsp"`, method `action_buka_kunci`
+- Tombol `Buka Kunci (Admin)`: `invisible="state != 'dikunci'"`, `groups="plugins_manajement_asesor.group_admin_lsp"`, method `action_buka_kunci`
 - `<sheet>` dengan informasi header (name, jadwal_id, skema_display, tanggal_penugasan)
-- **Alert banner** jika `is_valid == False` dan `state == 'draft'`: tampilkan pesan "⚠️ Jumlah asesor belum mencukupi. Tambahkan X asesor lagi." → gunakan `invisible="is_valid or state != 'draft'"`
+- **Alert banner** jika `is_valid == False` dan `state == 'draft'`: gunakan `<div class="alert alert-warning" invisible="is_valid or state == 'dikunci'">` — tampilkan pesan "⚠️ Jumlah asesor belum mencukupi. Tambahkan X asesor lagi."
 - `<notebook>` dengan dua tab:
-  - Tab **"Daftar Asesor & Asesi"**: tampilkan `penugasan_line_ids` sebagai one2many `<list>` + tombol `Tambah Asesor` yang membuka wizard
+  - Tab **"Daftar Asesor & Asesi"**: tampilkan `penugasan_line_ids` sebagai one2many tree + tombol `Tambah Asesor` yang membuka wizard
   - Tab **"Informasi Jadwal"**: tampilkan `jumlah_asesi`, `jumlah_asesor_dibutuhkan`, `total_asesor`, `is_valid` dalam readonly
-- `<chatter/>` di bawah sheet (Odoo 19 menggunakan tag `<chatter/>` bukan `<div class="oe_chatter">`)
-- Semua field harus `readonly="1"` saat `state == 'dikunci'` menggunakan atribut `readonly` langsung dengan ekspresi Python (contoh: `readonly="state == 'dikunci'"`)
+- `<chatter/>` shorthand di bawah sheet (**Odoo 19: gunakan `<chatter/>` tag tunggal, bukan `<div class="oe_chatter">` + sub-widget manual**)
+- Semua field harus `readonly="state == 'dikunci'"` menggunakan ekspresi inline (bukan `attrs`)
 
-**List View `lsp.penugasan.asesor`:** (Odoo 19: gunakan `<list>` bukan `<tree>`)
+**Tree View `lsp.penugasan.asesor`:**
 - Kolom: `name`, `jadwal_id`, `total_asesor`, `jumlah_asesor_dibutuhkan`, `total_asesi`, `state`
 - `decoration-danger="not is_valid and state == 'draft'"`
 - `decoration-success="state == 'dikunci'"`
@@ -361,17 +371,25 @@ Buat view lengkap di dalam tag `<odoo>`:
 - Filter: `Draft` (`state = 'draft'`), `Dikunci` (`state = 'dikunci'`)
 - Group by: `jadwal_id`, `state`, `tanggal_penugasan`
 
+> ⚠️ **Odoo 19 — Perubahan Kritis di XML View:**
+> - **HAPUS semua `attrs="{...}"`** — sudah fully deprecated dan akan error di Odoo 19
+> - Gunakan atribut langsung: `invisible="..."`, `readonly="..."`, `required="..."` dengan ekspresi Python
+> - Contoh lama (SALAH di Odoo 19): `attrs="{'readonly': [('state', '=', 'dikunci')]}"`
+> - Contoh baru (BENAR di Odoo 19): `readonly="state == 'dikunci'"`
+> - **`<group col="...">` masih valid**, tapi gunakan `<field>` dengan `column_invisible` untuk kolom list
+> - **Gunakan `<list>` bukan `<tree>`** — di Odoo 17+ tag `<tree>` sudah diganti `<list>`, dan di Odoo 19 ini wajib
+
 ---
 
 ### 8. `views/lsp_penugasan_line_views.xml`
 
-**List View (embedded di form penugasan — bukan standalone):** (Odoo 19: gunakan `<list>` bukan `<tree>`)
+**List View (embedded di form penugasan — bukan standalone):**
+- Gunakan tag `<list>` bukan `<tree>` (**Odoo 19: `<tree>` deprecated, wajib pakai `<list>`**)
 - Kolom: `asesor_id`, `jumlah_asesi`, `is_overload`
 - Field `asesi_ids` dengan `widget="many2many_tags"`
 - `decoration-danger="is_overload == True"`
 - `editable="bottom"` hanya saat `penugasan_id.state == 'draft'`
-- Gunakan `readonly="state == 'dikunci'"` langsung di setiap field (Odoo 19: tanpa `attrs`)
-- Gunakan `column_invisible="1"` untuk menyembunyikan kolom di list (bukan `invisible="1"`)
+- Gunakan `readonly="state == 'dikunci'"` pada setiap field (ekspresi inline, bukan `attrs`)
 
 ---
 
@@ -380,8 +398,10 @@ Buat view lengkap di dalam tag `<odoo>`:
 ```xml
 <!-- Form view untuk lsp.wizard.tambah.asesor -->
 <!-- Target: new (popup dialog) -->
+<!-- Odoo 19: gunakan <dialog> wrapper atau target="new" di action -->
 <!-- Tampilkan: penugasan_id (readonly), preview_info (readonly, widget text), asesor_ids (many2many_tags) -->
 <!-- Footer: tombol 'Tambah Asesor' (type=object, action_tambah_asesor) + tombol 'Batal' (special=cancel) -->
+<!-- INGAT: gunakan invisible="..." bukan attrs di semua elemen -->
 ```
 
 ---
@@ -408,8 +428,8 @@ Buat dua QWeb template:
 <!-- Struktur menu: -->
 <!-- LSP (top menu, category=LSP) -->
 <!--   └── Penugasan Asesor (menu group) -->
-<!--         ├── Semua Penugasan → action list+form lsp.penugasan.asesor -->
-<!--         └── Jadwal Ujian → action list+form lsp.jadwal.ujian -->
+<!--         ├── Semua Penugasan → action tree+form lsp.penugasan.asesor -->
+<!--         └── Jadwal Ujian → action tree+form lsp.jadwal.ujian -->
 ```
 
 ---
@@ -446,13 +466,13 @@ Rule 2 — Asesor hanya lihat penugasan yang mengandung dirinya:
 
 ```csv
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_lsp_penugasan_asesor_admin,lsp.penugasan.asesor admin,model_lsp_penugasan_asesor,lsp_penugasan_asesor.group_admin_lsp,1,1,1,1
-access_lsp_penugasan_asesor_asesor,lsp.penugasan.asesor asesor,model_lsp_penugasan_asesor,lsp_penugasan_asesor.group_asesor,1,0,0,0
-access_lsp_penugasan_line_admin,lsp.penugasan.line admin,model_lsp_penugasan_line,lsp_penugasan_asesor.group_admin_lsp,1,1,1,1
-access_lsp_penugasan_line_asesor,lsp.penugasan.line asesor,model_lsp_penugasan_line,lsp_penugasan_asesor.group_asesor,1,0,0,0
-access_lsp_jadwal_ujian_admin,lsp.jadwal.ujian admin,model_lsp_jadwal_ujian,lsp_penugasan_asesor.group_admin_lsp,1,1,1,1
-access_lsp_jadwal_ujian_asesor,lsp.jadwal.ujian asesor,model_lsp_jadwal_ujian,lsp_penugasan_asesor.group_asesor,1,0,0,0
-access_lsp_wizard_tambah_asesor,lsp.wizard.tambah.asesor,model_lsp_wizard_tambah_asesor,lsp_penugasan_asesor.group_admin_lsp,1,1,1,1
+access_lsp_penugasan_asesor_admin,lsp.penugasan.asesor admin,model_lsp_penugasan_asesor,plugins_manajement_asesor.group_admin_lsp,1,1,1,1
+access_lsp_penugasan_asesor_asesor,lsp.penugasan.asesor asesor,model_lsp_penugasan_asesor,plugins_manajement_asesor.group_asesor,1,0,0,0
+access_lsp_penugasan_line_admin,lsp.penugasan.line admin,model_lsp_penugasan_line,plugins_manajement_asesor.group_admin_lsp,1,1,1,1
+access_lsp_penugasan_line_asesor,lsp.penugasan.line asesor,model_lsp_penugasan_line,plugins_manajement_asesor.group_asesor,1,0,0,0
+access_lsp_jadwal_ujian_admin,lsp.jadwal.ujian admin,model_lsp_jadwal_ujian,plugins_manajement_asesor.group_admin_lsp,1,1,1,1
+access_lsp_jadwal_ujian_asesor,lsp.jadwal.ujian asesor,model_lsp_jadwal_ujian,plugins_manajement_asesor.group_asesor,1,0,0,0
+access_lsp_wizard_tambah_asesor,lsp.wizard.tambah.asesor,model_lsp_wizard_tambah_asesor,plugins_manajement_asesor.group_admin_lsp,1,1,1,1
 ```
 
 ---
@@ -475,7 +495,7 @@ Buat:
 <!-- id: lsp_penugasan_email_template -->
 <!-- name: Notifikasi Penugasan Asesor LSP -->
 <!-- model_id: lsp.penugasan.asesor -->
-<!-- subject: [LSP] Penugasan Asesor: {{ object.jadwal_id.name }} -->  (Odoo 19: gunakan Jinja2 {{ }} bukan Mako ${} )
+<!-- subject: [LSP] Penugasan Asesor: ${object.jadwal_id.name} -->
 <!-- body_html: QWeb template berisi informasi lengkap penugasan + daftar asesi + link portal -->
 <!-- auto_delete: False -->
 ```
@@ -581,37 +601,40 @@ Buat:
 
 ---
 
-## ⚠️ ATURAN PENGKODEAN WAJIB
+## ⚠️ ATURAN PENGKODEAN WAJIB (ODOO 19)
 
 ### Python:
 1. Gunakan `@api.constrains` di level model — constraint tidak boleh hanya ada di wizard atau UI.
 2. Gunakan `@api.depends` dengan dependency yang tepat untuk semua field computed.
-3. Semua string pesan user-facing harus menggunakan `_('...')` dari `odoo.tools.translate`.
+3. Semua string pesan user-facing harus menggunakan `_('...')` dari `odoo.tools.translate` — di Odoo 19 import via `from odoo import _`.
 4. Jangan gunakan `sudo()` tanpa komentar alasan keamanan yang jelas.
 5. Method `action_*` yang dipanggil button HARUS return dict action atau `True`, bukan `None`.
 6. Selalu definisikan `ondelete=` secara eksplisit di setiap field Many2one.
 7. Gunakan `self.ensure_one()` di method yang hanya boleh dijalankan untuk satu record.
-8. Jangan gunakan `@api.one` (sudah deprecated sejak Odoo 14).
+8. Jangan gunakan `@api.one` atau `@api.multi` (deprecated sejak Odoo 14, error di Odoo 19).
 9. Gunakan `_sql_constraints` untuk constraint uniqueness di level database.
 10. Field `state` wajib punya `copy=False` dan `tracking=True`.
-11. **JANGAN** gunakan `@api.model_create_multi` — di Odoo 18+ method `create()` sudah default menerima list of vals. Gunakan `@api.model` saja.
+11. **Odoo 19 — NEW**: Gunakan `model._fields['field_name'].selection` untuk akses dynamic selection, bukan hardcode.
+12. **Odoo 19 — NEW**: Untuk computed stored field yang perlu recompute manual, gunakan `self.env.add_to_compute(self._fields['field_name'], records)`.
+13. **Odoo 19 — NEW**: Jika menggunakan `Environment`, gunakan `self.env` bukan `self.pool` (sudah tidak ada di Odoo 19).
+14. **Odoo 19 — NEW**: Gunakan `@api.model_create_multi` untuk override `create()` — bukan `@api.model` saja.
 
-### XML (Odoo 19 — Perubahan Breaking dari Odoo 17):
+### XML Views:
 1. Root element setiap file XML adalah `<odoo>`.
 2. Setiap `<record>` wajib punya `id` unik dengan prefix `lsp_penugasan_`.
 3. Setiap action window wajib mendefinisikan `view_mode`, `res_model`, dan `name`.
-4. **JANGAN** gunakan `attrs` — sudah **dihapus** sejak Odoo 18. Gunakan atribut langsung dengan ekspresi Python:
-   - ❌ `attrs="{'invisible': [('state', '=', 'dikunci')]}"` 
-   - ✅ `invisible="state == 'dikunci'"`
-   - ❌ `attrs="{'readonly': [('state', '=', 'dikunci')]}"` 
-   - ✅ `readonly="state == 'dikunci'"`
-   - Untuk kondisi gabungan: `invisible="state == 'dikunci' or not is_valid"`
-5. **JANGAN** gunakan `<tree>` — sudah **deprecated**. Gunakan `<list>` sebagai penggantinya.
-6. Untuk menyembunyikan kolom di `<list>`, gunakan `column_invisible="1"` (bukan `invisible="1"`).
-7. Form view wajib menggunakan `<sheet>` dan tag `<chatter/>` untuk mail.thread (bukan `<div class="oe_chatter">`).
+4. **Odoo 19 — WAJIB**: Ganti semua `attrs="{...}"` dengan ekspresi inline:
+   - `invisible="ekspresi_python"` 
+   - `readonly="ekspresi_python"`
+   - `required="ekspresi_python"`
+   - Contoh: `readonly="state == 'dikunci'"` — BUKAN `attrs="{'readonly': [('state','=','dikunci')]}"`
+5. **Odoo 19 — WAJIB**: Gunakan `<list>` bukan `<tree>` untuk semua list/tree view.
+6. **Odoo 19 — WAJIB**: Gunakan `<chatter/>` tag tunggal, bukan `<div class="oe_chatter">`.
+7. Form view wajib menggunakan `<sheet>`.
 8. Tombol yang memanggil Python method gunakan `type="object"`.
 9. Jangan lupa `string=` di setiap elemen `<button>`.
-10. Mail template menggunakan sintaks **Jinja2** `{{ object.field }}` (bukan Mako `${object.field}`).
+10. **Odoo 19 — NEW**: Untuk domain di field, gunakan format `domain="[('field', '=', value)]"` — syntax tidak berubah, tapi pastikan tidak menggunakan `[]` string (harus list Python).
+11. **Odoo 19 — NEW**: `states=` attribute di `<field>` tag sudah DEPRECATED, ganti dengan `invisible=` / `readonly=`.
 
 ### CSV Security:
 1. Header kolom wajib persis: `id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink`
@@ -668,7 +691,7 @@ Pastikan semua item berikut terpenuhi sebelum menyerahkan hasil:
 - [ ] SQL constraint unique asesor per penugasan sudah ada
 - [ ] Distribusi otomatis tidak menghasilkan asesi lebih dari 10 per asesor
 - [ ] Semua asesi di jadwal tertugaskan setelah distribusi (tidak ada yang terlewat)
-- [ ] State `dikunci` membuat semua field menjadi readonly (verifikasi di tampilan form)
+- [ ] State `dikunci` membuat semua field menjadi readonly — gunakan `readonly="state == 'dikunci'"` di XML (Odoo 19: bukan `attrs`)
 
 **Notifikasi & Audit:**
 - [ ] Notifikasi terkirim ke chatter/email setiap Asesor saat penugasan dikunci
@@ -685,20 +708,24 @@ Pastikan semua item berikut terpenuhi sebelum menyerahkan hasil:
 
 **Testing:**
 - [ ] Semua unit test berjalan tanpa error
-- [ ] Modul dapat diinstall: `./odoo-bin -i lsp_penugasan_asesor` tanpa error
-- [ ] Modul dapat diupdate: `./odoo-bin -u lsp_penugasan_asesor` tanpa error
+- [ ] Modul dapat diinstall: `./odoo-bin -i plugins_manajement_asesor` tanpa error
+- [ ] Modul dapat diupdate: `./odoo-bin -u plugins_manajement_asesor` tanpa error
 
 **Kualitas Kode:**
 - [ ] Tidak ada `print()` statement di kode produksi
 - [ ] Semua string user-facing menggunakan `_('...')`
 - [ ] Tidak ada hardcoded database ID
-- [ ] Tidak ada `@api.one` (deprecated)
+- [ ] Tidak ada `@api.one` atau `@api.multi` (error di Odoo 19)
+- [ ] Tidak ada `attrs="{...}"` di XML (deprecated di Odoo 19, gunakan ekspresi inline)
+- [ ] Tidak ada `<tree>` tag di XML view (wajib pakai `<list>` di Odoo 19)
+- [ ] Tidak ada `states=` attribute di `<field>` tag (deprecated, pakai `invisible=`/`readonly=`)
+- [ ] Tidak ada `<div class="oe_chatter">` manual (pakai `<chatter/>` di Odoo 19)
 
 ---
 
 ## 🚫 LARANGAN KERAS
 
-1. **JANGAN** menggunakan API Odoo versi lama (`osv`, `orm`, `@api.one`, `@api.multi`, `@api.model_create_multi`).
+1. **JANGAN** menggunakan API Odoo versi lama (`osv`, `orm`, `@api.one`, `@api.multi`).
 2. **JANGAN** skip pembuatan file `tests/` — pengujian adalah bagian dari deliverable wajib.
 3. **JANGAN** hardcode ID database (contoh: `group_id = 5`), selalu gunakan XML ID.
 4. **JANGAN** letakkan business logic di dalam file XML view — semua logika ada di Python model.
@@ -707,10 +734,12 @@ Pastikan semua item berikut terpenuhi sebelum menyerahkan hasil:
 7. **JANGAN** buat file Python tanpa mengimpornya di `__init__.py` yang sesuai.
 8. **JANGAN** gunakan `sudo()` pada validasi security-sensitive tanpa penjelasan.
 9. **JANGAN** lupa menambahkan `copy=False` pada field sequence/name dan state.
-10. **JANGAN** gunakan `attrs` di XML view — sudah dihapus sejak Odoo 18. Gunakan atribut inline.
-11. **JANGAN** gunakan `<tree>` — gunakan `<list>` (deprecated sejak Odoo 17, dihapus di Odoo 19).
-12. **JANGAN** gunakan `<div class="oe_chatter">` — gunakan tag `<chatter/>` (Odoo 18+).
-13. **JANGAN** gunakan sintaks Mako `${...}` di mail template — gunakan Jinja2 `{{ ... }}`.
+10. **JANGAN** gunakan `attrs="{...}"` di XML — **ini akan menyebabkan error di Odoo 19**.
+11. **JANGAN** gunakan `<tree>` tag untuk list view — **wajib ganti dengan `<list>` di Odoo 19**.
+12. **JANGAN** gunakan `states=` attribute di `<field>` — sudah deprecated, gunakan `invisible=` atau `readonly=`.
+13. **JANGAN** gunakan `<div class="oe_chatter">` secara manual — gunakan `<chatter/>` di Odoo 19.
+14. **JANGAN** gunakan `self.pool` — sudah tidak ada di Odoo 19, gunakan `self.env`.
+15. **JANGAN** override `create()` dengan `@api.model` saja — gunakan `@api.model_create_multi` di Odoo 19.
 
 ---
 
@@ -718,17 +747,34 @@ Pastikan semua item berikut terpenuhi sebelum menyerahkan hasil:
 
 Setelah selesai, hasilkan:
 
-1. **Seluruh isi folder `lsp_penugasan_asesor/`** dengan semua file yang fungsional dan dapat langsung di-copy ke direktori addons Odoo 19.
+1. **Seluruh isi folder `plugins_manajement_asesor/`** dengan semua file yang fungsional dan dapat langsung di-copy ke direktori addons Odoo 19.
 2. **File `README_INSTALASI.md`** di dalam folder modul, berisi:
    - Langkah instalasi ke Odoo 19
-   - Cara menjalankan unit test
+   - Cara menjalankan unit test: `./odoo-bin -i plugins_manajement_asesor --test-enable --stop-after-init`
    - Daftar group user yang perlu dikonfigurasi
    - Catatan dependensi dengan modul lain
+   - Catatan migrasi jika upgrade dari Odoo 17/18 ke 19
 3. **Tidak ada placeholder kosong** — setiap method, class, dan file harus berisi implementasi yang nyata dan dapat dijalankan.
 
 ---
 
+## 🆕 RINGKASAN PERUBAHAN PENTING ODOO 19 vs ODOO 17
+
+| Aspek | Odoo 17 (Lama) | Odoo 19 (Wajib Digunakan) |
+|---|---|---|
+| List view tag | `<tree>` | `<list>` |
+| Dynamic visibility | `attrs="{'invisible': [...]}"` | `invisible="ekspresi_python"` |
+| Dynamic readonly | `attrs="{'readonly': [...]}"` | `readonly="ekspresi_python"` |
+| Field states attr | `states="draft: readonly"` | `readonly="state != 'draft'"` |
+| Chatter | `<div class="oe_chatter">...` | `<chatter/>` |
+| Create override | `@api.model` | `@api.model_create_multi` |
+| Pool access | `self.pool['model']` | `self.env['model']` |
+| Manifest version | `'17.0.1.0.0'` | `'19.0.1.0.0'` |
+| QWeb assets | `web.assets_backend` di XML | `assets` key di `__manifest__.py` |
+
+---
+
 *Dokumen prompt ini disusun berdasarkan:*
-*- Dokumen Analisis Proses Bisnis LSP, Kelas D4-3B POLBAN 2026*
+*- Dokumen Analisis Proses Bisnis LSP, Kelas D4-3B POLBAN 2025*
 *- Diagram BPMN Alur Penugasan Asesor (IV.5)*
-*- Standar pengembangan modul Odoo 19*
+*- Standar pengembangan modul Odoo 19 (versi terbaru)*

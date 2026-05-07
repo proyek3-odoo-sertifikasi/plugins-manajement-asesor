@@ -30,6 +30,11 @@
         'views/lsp_penugasan_line_views.xml',
         'views/portal_templates.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            # OWL/JS/CSS assets can be added here if needed by the module
+        ],
+    },
     'installable': True,
     'application': False,
     'auto_install': False,

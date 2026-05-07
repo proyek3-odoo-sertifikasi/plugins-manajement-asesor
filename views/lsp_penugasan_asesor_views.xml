@@ -118,9 +118,9 @@
                   decoration-success="state == 'dikunci'">
                 <field name="name"/>
                 <field name="jadwal_id"/>
-                <field name="total_asesor"/>
-                <field name="jumlah_asesor_dibutuhkan"/>
-                <field name="total_asesi"/>
+                <field name="total_asesi" string="Total Asesi"/>
+                <field name="jumlah_asesor_dibutuhkan" string="Butuh Asesor"/>
+                <field name="total_asesor" string="Asesor Terisi"/>
                 <field name="is_valid" column_invisible="1"/>
                 <field name="state" widget="badge"
                        decoration-info="state == 'draft'"
@@ -139,6 +139,11 @@
             <search>
                 <field name="name"/>
                 <field name="jadwal_id"/>
+                <filter name="filter_draft" string="Draft" domain="[('state','=','draft')]"/>
+                <filter name="filter_dikunci" string="Dikunci" domain="[('state','=','dikunci')]"/>
+                <filter name="group_jadwal" string="Group by Jadwal" context="{'group_by':'jadwal_id'}"/>
+                <filter name="group_state" string="Group by Status" context="{'group_by':'state'}"/>
+                <filter name="group_tanggal" string="Group by Tanggal" context="{'group_by':'tanggal_penugasan'}"/>
             </search>
         </field>
     </record>

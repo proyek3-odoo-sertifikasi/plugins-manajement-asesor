@@ -23,7 +23,7 @@
                 <group>
                     <field name="penugasan_id" readonly="1"/>
                     <field name="preview_info" readonly="1" widget="text"/>
-                    <field name="asesor_ids" widget="many2many_tags"/>
+                          <field name="asesor_ids" widget="many2many_tags"/>
                 </group>
                 <footer>
                     <button name="action_tambah_asesor"

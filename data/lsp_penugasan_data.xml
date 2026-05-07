@@ -77,6 +77,20 @@
                                                 </tr>
                                             </table>
 
+                                            <p><strong>Daftar Asesi yang Ditugaskan:</strong></p>
+                                            <t t-foreach="object.penugasan_line_ids" t-as="line">
+                                                <p style="margin-top:8px;"><strong>Asesor:</strong> <t t-out="line.asesor_id.name"/></p>
+                                                <ol style="margin-top:0px; margin-bottom:8px;">
+                                                    <t t-foreach="line.asesi_ids" t-as="asesi">
+                                                        <li><t t-out="asesi.name"/></li>
+                                                    </t>
+                                                </ol>
+                                            </t>
+                                            
+                                            <p style="font-size: 12px; color: grey;">
+                                                <em>Penugasan ini dikunci oleh <t t-out="object.env.user.name" /> pada <t t-out="datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')" /></em>
+                                            </p>
+
                                             <p>Silakan cek detail penugasan Anda melalui portal:</p>
                                             <p style="text-align: center; margin: 16px 0;">
                                                 <a href="/my/penugasan/{{ object.id }}"

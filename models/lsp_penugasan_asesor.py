@@ -1,7 +1,6 @@
 import math
 
-from odoo import api, fields, models
-from odoo.tools.translate import _
+from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
 
@@ -27,9 +26,9 @@ class LspPenugasanAsesor(models.Model):
     )
     skema_display = fields.Char(
         string='Skema Sertifikasi',
-        related='jadwal_id.skema_id',
+        compute='_compute_skema_display',
         readonly=True,
-        store=False,
+        store=True,
     )
     tanggal_penugasan = fields.Date(
         string='Tanggal Penugasan',
@@ -79,12 +78,12 @@ class LspPenugasanAsesor(models.Model):
          'Sudah ada penugasan untuk jadwal ini. Satu jadwal hanya boleh memiliki satu record penugasan.')
     ]
 
-    @api.model
+    @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
             if vals.get('name', _('New')) == _('New'):
                 vals['name'] = self.env['ir.sequence'].next_by_code('lsp.penugasan.asesor') or _('New')
-        return super().create(vals_list)
+        return super(LspPenugasanAsesor, self).create(vals_list)
 
     @api.depends('penugasan_line_ids')
     def _compute_total_asesor(self):
@@ -95,6 +94,19 @@ class LspPenugasanAsesor(models.Model):
     def _compute_total_asesi(self):
         for record in self:
             record.total_asesi = record.jadwal_id.jumlah_asesi if record.jadwal_id else 0
+
+    @api.depends('jadwal_id', 'jadwal_id.skema_id')
+    def _compute_skema_display(self):
+        for record in self:
+            skema = False
+            if record.jadwal_id:
+                # jadwal.skema_id may be Char or Many2one in future
+                val = record.jadwal_id.skema_id
+                if hasattr(val, 'name'):
+                    skema = val.name
+                else:
+                    skema = val
+            record.skema_display = skema or ''
 
     @api.depends('total_asesi')
     def _compute_jumlah_asesor_dibutuhkan(self):
@@ -130,16 +142,21 @@ class LspPenugasanAsesor(models.Model):
                 )
             )
 
-        # Hapus semua asesi dari setiap line sebelum redistribusi
-        for line in asesor_lines:
-            line.asesi_ids = [(5, 0, 0)]
+        # Prepare mapping untuk asignasi per line (hindari multiple write/append)
+        line_records = list(asesor_lines)
+        assignments = {line.id: [] for line in line_records}
 
         # Algoritma distribusi round-robin
         asesi_sorted = asesi_list.sorted(key=lambda r: r.id)
-        asesor_count = len(asesor_lines)
+        asesor_count = len(line_records)
         for idx, asesi in enumerate(asesi_sorted):
-            line_idx = idx % asesor_count
-            asesor_lines[line_idx].asesi_ids = [(4, asesi.id)]
+            target_line = line_records[idx % asesor_count]
+            assignments[target_line.id].append(asesi.id)
+
+        # Tulis assignments sekali per line menggunakan (6,0,ids) untuk replace
+        for line in line_records:
+            ids = assignments.get(line.id, [])
+            line.asesi_ids = [(6, 0, ids)]
 
         self.message_post(
             body=_('Distribusi otomatis berhasil. %d asesi telah didistribusikan ke %d asesor secara merata.') % (
