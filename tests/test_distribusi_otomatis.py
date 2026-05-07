@@ -1,4 +1,5 @@
-from datetime import datetime, timedelta
+from datetime import date
+
 
 from odoo.tests.common import TransactionCase, tagged
 
@@ -38,11 +39,12 @@ class TestDistribusiOtomatis(TransactionCase):
         """Helper: buat jadwal dengan sejumlah asesi."""
         asesi = self.asesi_partners[:asesi_count]
         jadwal = self.env['lsp.jadwal.ujian'].create({
-            'name': 'Jadwal Distrib %s' % datetime.now().strftime('%H%M%S%f'),
+            'name': 'Jadwal Distrib %d asesi' % asesi_count,
             'skema_id': 'Skema Distrib Test',
-            'tanggal_mulai': datetime.now(),
-            'tanggal_selesai': datetime.now() + timedelta(hours=3),
-            'ruangan': 'Ruang Distrib',
+            'tanggal_mulai': date.today(),
+            'tanggal_selesai': date.today(),
+            'waktu_mulai': 7.5,
+            'waktu_selesai': 16.0,
             'state': 'terjadwal',
             'asesi_ids': [(6, 0, asesi.ids)],
         })

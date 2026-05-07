@@ -52,7 +52,10 @@
                             <field name="jadwal_id"
                                    readonly="state == 'dikunci'"/>
                             <field name="skema_display"/>
+                            <!-- Tanggal spesifik hari H ujian untuk penugasan ini
+                                 (harus berada dalam rentang tanggal jadwal ujian) -->
                             <field name="tanggal_penugasan"
+                                   string="Tanggal Ujian (Hari Spesifik)"
                                    readonly="state == 'dikunci'"/>
                         </group>
                         <group string="Status Kuota">
@@ -74,6 +77,10 @@
                                       decoration-danger="is_overload == True">
                                     <field name="asesor_id"
                                            readonly="parent.state == 'dikunci'"/>
+                                    <field name="ruangan"
+                                           string="Ruangan (Pitstop)"
+                                           readonly="parent.state == 'dikunci'"
+                                           placeholder="Contoh: 1, 2, Ruang A..."/>
                                     <field name="asesi_ids" widget="many2many_tags"
                                            readonly="parent.state == 'dikunci'"/>
                                     <field name="jumlah_asesi"/>

@@ -124,16 +124,20 @@
                                         <td><t t-esc="penugasan.skema_display or '-'"/></td>
                                     </tr>
                                     <tr>
-                                        <td class="fw-bold">Tanggal Mulai</td>
-                                        <td><t t-esc="penugasan.jadwal_id.tanggal_mulai" t-options="{'widget': 'datetime'}"/></td>
+                                        <td class="fw-bold">Periode Ujian</td>
+                                        <td>
+                                            <t t-esc="penugasan.jadwal_id.tanggal_mulai" t-options="{'widget': 'date'}"/>
+                                            s/d
+                                            <t t-esc="penugasan.jadwal_id.tanggal_selesai" t-options="{'widget': 'date'}"/>
+                                        </td>
                                     </tr>
                                     <tr>
-                                        <td class="fw-bold">Tanggal Selesai</td>
-                                        <td><t t-esc="penugasan.jadwal_id.tanggal_selesai" t-options="{'widget': 'datetime'}"/></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="fw-bold">Ruangan</td>
-                                        <td><t t-esc="penugasan.jadwal_id.ruangan or '-'"/></td>
+                                        <td class="fw-bold">Waktu Ujian</td>
+                                        <td>
+                                            <t t-esc="penugasan.jadwal_id.waktu_mulai_display"/>
+                                            –
+                                            <t t-esc="penugasan.jadwal_id.waktu_selesai_display"/>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td class="fw-bold">Tanggal Penugasan</td>

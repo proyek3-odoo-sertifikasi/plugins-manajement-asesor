@@ -64,16 +64,12 @@
                                                     <td>{{ object.skema_display or '-' }}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td><strong>Tanggal Mulai</strong></td>
-                                                    <td>{{ object.jadwal_id.tanggal_mulai }}</td>
+                                                    <td><strong>Periode Ujian</strong></td>
+                                                    <td>{{ object.jadwal_id.tanggal_mulai }} s/d {{ object.jadwal_id.tanggal_selesai }}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td><strong>Tanggal Selesai</strong></td>
-                                                    <td>{{ object.jadwal_id.tanggal_selesai }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td><strong>Ruangan</strong></td>
-                                                    <td>{{ object.jadwal_id.ruangan or '-' }}</td>
+                                                    <td><strong>Waktu Ujian</strong></td>
+                                                    <td>{{ object.jadwal_id.waktu_mulai_display }} – {{ object.jadwal_id.waktu_selesai_display }}</td>
                                                 </tr>
                                             </table>
 
