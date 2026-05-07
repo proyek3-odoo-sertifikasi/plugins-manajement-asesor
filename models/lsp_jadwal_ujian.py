@@ -2,7 +2,7 @@ import math
 
 from odoo import api, fields, models
 from odoo.tools.translate import _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class LspJadwalUjian(models.Model):
@@ -19,16 +19,35 @@ class LspJadwalUjian(models.Model):
     skema_id = fields.Char(
         string='Skema Sertifikasi',
     )
-    tanggal_mulai = fields.Datetime(
+    tanggal_mulai = fields.Date(
         string='Tanggal Mulai',
         required=True,
+        help='Tanggal mulai periode ujian.',
     )
-    tanggal_selesai = fields.Datetime(
+    tanggal_selesai = fields.Date(
         string='Tanggal Selesai',
         required=True,
+        help='Tanggal selesai periode ujian.',
     )
-    ruangan = fields.Char(
-        string='Ruangan',
+    waktu_mulai = fields.Float(
+        string='Jam Mulai (Harian)',
+        default=7.5,
+        help='Jam mulai ujian setiap harinya. Contoh: 7.5 = 07:30',
+    )
+    waktu_selesai = fields.Float(
+        string='Jam Selesai (Harian)',
+        default=16.0,
+        help='Jam selesai ujian setiap harinya. Contoh: 16.0 = 16:00',
+    )
+    waktu_mulai_display = fields.Char(
+        string='Mulai',
+        compute='_compute_waktu_display',
+        store=True,
+    )
+    waktu_selesai_display = fields.Char(
+        string='Selesai',
+        compute='_compute_waktu_display',
+        store=True,
     )
     state = fields.Selection(
         selection=[
@@ -103,6 +122,30 @@ class LspJadwalUjian(models.Model):
     def _compute_is_kuota_cukup(self):
         for record in self:
             record.is_kuota_cukup = record.jumlah_asesor_tersedia >= record.jumlah_asesor_dibutuhkan
+
+    @api.depends('waktu_mulai', 'waktu_selesai')
+    def _compute_waktu_display(self):
+        for record in self:
+            def float_to_time(f):
+                jam = int(f)
+                menit = int(round((f - jam) * 60))
+                return '%02d.%02d' % (jam, menit)
+
+            record.waktu_mulai_display = float_to_time(record.waktu_mulai) if record.waktu_mulai else '00.00'
+            record.waktu_selesai_display = float_to_time(record.waktu_selesai) if record.waktu_selesai else '00.00'
+
+    @api.constrains('tanggal_mulai', 'tanggal_selesai', 'waktu_mulai', 'waktu_selesai')
+    def _check_waktu(self):
+        for record in self:
+            if record.waktu_selesai <= record.waktu_mulai:
+                raise ValidationError(
+                    _('Jam selesai harus lebih besar dari jam mulai ujian.')
+                )
+            if record.tanggal_selesai and record.tanggal_mulai \
+                    and record.tanggal_selesai < record.tanggal_mulai:
+                raise ValidationError(
+                    _('Tanggal selesai tidak boleh lebih awal dari tanggal mulai.')
+                )
 
     def action_mulai_penugasan(self):
         """Membuat record penugasan baru terkait jadwal ini dan mengubah state."""

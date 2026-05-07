@@ -1,4 +1,5 @@
-from datetime import datetime, timedelta
+from datetime import date
+
 
 from odoo.exceptions import UserError, ValidationError
 from odoo.tests.common import TransactionCase, tagged
@@ -49,15 +50,17 @@ class TestPenugasanAsesor(TransactionCase):
         """Helper: buat jadwal dengan sejumlah asesi."""
         asesi = self.asesi_partners[:asesi_count]
         jadwal = self.env['lsp.jadwal.ujian'].create({
-            'name': 'Jadwal Test %s' % datetime.now().strftime('%H%M%S'),
+            'name': 'Jadwal Test %d asesi' % asesi_count,
             'skema_id': 'Skema Test',
-            'tanggal_mulai': datetime.now(),
-            'tanggal_selesai': datetime.now() + timedelta(hours=3),
-            'ruangan': 'Ruang 101',
+            'tanggal_mulai': date.today(),
+            'tanggal_selesai': date.today(),
+            'waktu_mulai': 7.5,
+            'waktu_selesai': 16.0,
             'state': 'terjadwal',
             'asesi_ids': [(6, 0, asesi.ids)],
         })
         return jadwal
+
 
     def _create_penugasan(self, jadwal, asesor_users):
         """Helper: buat penugasan dengan asesor yang ditentukan."""

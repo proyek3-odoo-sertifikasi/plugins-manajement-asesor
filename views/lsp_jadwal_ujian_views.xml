@@ -28,9 +28,22 @@
                     <group>
                         <group string="Informasi Jadwal">
                             <field name="skema_id"/>
+                            <!-- Rentang tanggal pelaksanaan ujian -->
                             <field name="tanggal_mulai"/>
                             <field name="tanggal_selesai"/>
-                            <field name="ruangan"/>
+                            <!-- Jam pelaksanaan ujian setiap harinya -->
+                            <label for="waktu_mulai" string="Jam Ujian (Harian)"/>
+                            <div class="o_field_widget">
+                                <field name="waktu_mulai"
+                                       widget="float_time"
+                                       class="oe_inline"
+                                       style="width:80px"/>
+                                <span class="mx-1">–</span>
+                                <field name="waktu_selesai"
+                                       widget="float_time"
+                                       class="oe_inline"
+                                       style="width:80px"/>
+                            </div>
                         </group>
                         <group string="Statistik">
                             <field name="jumlah_asesi"/>
@@ -47,7 +60,8 @@
                             <field name="penugasan_ids" readonly="1">
                                 <list>
                                     <field name="name"/>
-                                    <field name="tanggal_penugasan"/>
+                                    <!-- tanggal_penugasan = hari spesifik ujian untuk penugasan ini -->
+                                    <field name="tanggal_penugasan" string="Tanggal Ujian (Spesifik)"/>
                                     <field name="total_asesor"/>
                                     <field name="total_asesi"/>
                                     <field name="state" widget="badge"
@@ -74,7 +88,8 @@
                 <field name="skema_id"/>
                 <field name="tanggal_mulai"/>
                 <field name="tanggal_selesai"/>
-                <field name="ruangan"/>
+                <field name="waktu_mulai_display" string="Jam Mulai"/>
+                <field name="waktu_selesai_display" string="Jam Selesai"/>
                 <field name="jumlah_asesi"/>
                 <field name="jumlah_asesor_dibutuhkan"/>
                 <field name="state" widget="badge"
@@ -95,6 +110,16 @@
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
+                <field name="skema_id"/>
+                <field name="tanggal_mulai"/>
+                <filter string="Draft" name="filter_draft" domain="[('state','=','draft')]"/>
+                <filter string="Terjadwal" name="filter_terjadwal" domain="[('state','=','terjadwal')]"/>
+                <filter string="Proses Penugasan" name="filter_penugasan" domain="[('state','=','penugasan')]"/>
+                <filter string="Berlangsung" name="filter_berlangsung" domain="[('state','=','berlangsung')]"/>
+                <filter string="Selesai" name="filter_selesai" domain="[('state','=','selesai')]"/>
+                <separator/>
+                <filter string="Kelompokkan: Tanggal" name="group_tanggal" context="{'group_by': 'tanggal_mulai'}"/>
+                <filter string="Kelompokkan: Status" name="group_state" context="{'group_by': 'state'}"/>
             </search>
         </field>
     </record>

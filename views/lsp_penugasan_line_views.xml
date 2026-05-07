@@ -13,6 +13,9 @@
                   decoration-danger="is_overload == True">
                 <field name="asesor_id"
                        readonly="state == 'dikunci'"/>
+                <field name="ruangan"
+                       string="Ruangan (Pitstop)"
+                       readonly="state == 'dikunci'"/>
                 <field name="asesi_ids" widget="many2many_tags"
                        readonly="state == 'dikunci'"/>
                 <field name="jumlah_asesi"/>
@@ -37,6 +40,10 @@
                             <field name="asesor_id"
                                    readonly="state == 'dikunci'"/>
                             <field name="asesor_partner_id"/>
+                            <field name="ruangan"
+                                   string="Ruangan (Pitstop)"
+                                   readonly="state == 'dikunci'"
+                                   placeholder="Contoh: 1, 2, Ruang A..."/>
                         </group>
                         <group string="Statistik">
                             <field name="jumlah_asesi"/>
@@ -44,11 +51,57 @@
                             <field name="state" invisible="1"/>
                         </group>
                     </group>
+
                     <separator string="Daftar Asesi yang Ditugaskan"/>
                     <field name="asesi_ids" widget="many2many_tags"
                            readonly="state == 'dikunci'"/>
+
+                    <separator string="Jadwal Waktu Ujian (per Slot)"/>
+                    <p class="text-muted small">
+                        Tambahkan slot waktu ujian yang akan ditangani asesor ini di ruangannya.
+                        Contoh: 07.30–09.00 (Slot 1), 09.00–10.30 (Slot 2), dst.
+                    </p>
+                    <field name="slot_waktu_ids"
+                           readonly="state == 'dikunci'">
+                        <list editable="bottom" string="Slot Waktu">
+                            <field name="jam_mulai"
+                                   widget="float_time"
+                                   string="Jam Mulai"/>
+                            <field name="jam_selesai"
+                                   widget="float_time"
+                                   string="Jam Selesai"/>
+                            <field name="waktu_display"
+                                   string="Waktu"
+                                   readonly="1"/>
+                            <field name="asesi_ids"
+                                   widget="many2many_tags"
+                                   string="Asesi di Slot Ini"/>
+                            <field name="jumlah_asesi_slot"
+                                   string="Jml. Asesi"
+                                   readonly="1"/>
+                        </list>
+                    </field>
                 </sheet>
             </form>
+        </field>
+    </record>
+
+    <!-- ============================================= -->
+    <!-- List View Slot Waktu (standalone)             -->
+    <!-- ============================================= -->
+    <record id="lsp_slot_waktu_tree" model="ir.ui.view">
+        <field name="name">lsp.slot.waktu.list</field>
+        <field name="model">lsp.slot.waktu</field>
+        <field name="arch" type="xml">
+            <list string="Slot Waktu Ujian"
+                  editable="bottom">
+                <field name="penugasan_line_id"/>
+                <field name="jam_mulai" widget="float_time" string="Jam Mulai"/>
+                <field name="jam_selesai" widget="float_time" string="Jam Selesai"/>
+                <field name="waktu_display" string="Waktu" readonly="1"/>
+                <field name="asesi_ids" widget="many2many_tags" string="Asesi"/>
+                <field name="jumlah_asesi_slot" string="Jml. Asesi" readonly="1"/>
+            </list>
         </field>
     </record>
 

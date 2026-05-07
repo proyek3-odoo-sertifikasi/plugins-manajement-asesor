@@ -27,6 +27,11 @@ class LspPenugasanLine(models.Model):
         readonly=True,
         store=False,
     )
+    ruangan = fields.Char(
+        string='Ruangan (Pitstop)',
+        help='Nomor atau nama ruangan tempat asesor ini bertugas. '
+             'Sesuai kolom Pitstop pada jadwal.',
+    )
     # TODO: replace with lsp.asesi model from lsp_pengajuan_asesi
     asesi_ids = fields.Many2many(
         comodel_name='res.partner',
@@ -34,6 +39,12 @@ class LspPenugasanLine(models.Model):
         column1='line_id',
         column2='partner_id',
         string='Daftar Asesi',
+    )
+    slot_waktu_ids = fields.One2many(
+        comodel_name='lsp.slot.waktu',
+        inverse_name='penugasan_line_id',
+        string='Jadwal Waktu Ujian',
+        help='Daftar slot waktu ujian yang ditangani asesor ini di ruangannya.',
     )
     jumlah_asesi = fields.Integer(
         string='Jumlah Asesi',

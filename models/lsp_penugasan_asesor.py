@@ -2,7 +2,7 @@ import math
 
 from odoo import api, fields, models
 from odoo.tools.translate import _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class LspPenugasanAsesor(models.Model):
@@ -75,9 +75,31 @@ class LspPenugasanAsesor(models.Model):
     )
 
     _sql_constraints = [
-        ('unique_jadwal_penugasan', 'UNIQUE(jadwal_id)',
-         'Sudah ada penugasan untuk jadwal ini. Satu jadwal hanya boleh memiliki satu record penugasan.')
+        ('unique_jadwal_tanggal_penugasan', 'UNIQUE(jadwal_id, tanggal_penugasan)',
+         'Sudah ada penugasan untuk jadwal dan tanggal yang sama. '
+         'Satu jadwal hanya boleh memiliki satu record penugasan per hari.')
     ]
+
+    @api.constrains('tanggal_penugasan', 'jadwal_id')
+    def _check_tanggal_dalam_rentang(self):
+        for record in self:
+            if not record.tanggal_penugasan or not record.jadwal_id:
+                continue
+            jadwal = record.jadwal_id
+            if not jadwal.tanggal_mulai or not jadwal.tanggal_selesai:
+                continue
+            tgl = record.tanggal_penugasan
+            if tgl < jadwal.tanggal_mulai or tgl > jadwal.tanggal_selesai:
+                raise ValidationError(
+                    _('Tanggal Ujian (Hari Spesifik) "%s" harus berada '
+                      'dalam rentang jadwal ujian "%s" '
+                      '(%s s/d %s).') % (
+                        tgl.strftime('%d %B %Y'),
+                        jadwal.name,
+                        jadwal.tanggal_mulai.strftime('%d %B %Y'),
+                        jadwal.tanggal_selesai.strftime('%d %B %Y'),
+                    )
+                )
 
     @api.model
     def create(self, vals_list):
