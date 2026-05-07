@@ -1,0 +1,62 @@
+# ─────────────────────────────────────────────
+#  .gitignore — plugins_manajement_asesor (Odoo Module)
+# ─────────────────────────────────────────────
+
+# ── Python cache & bytecode ──────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.so
+
+# ── Virtual environments ──────────────────────
+.env
+.venv/
+venv/
+env/
+ENV/
+
+# ── Odoo specifics ───────────────────────────
+# File session & log Odoo
+*.log
+*.pid
+
+# Odoo filestore (generated at runtime)
+filestore/
+
+# Odoo compiled assets
+*.css.map
+*.js.map
+
+# ── Editor / IDE ──────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ── Testing & coverage ────────────────────────
+.coverage
+coverage.xml
+htmlcov/
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+
+# ── OS-generated ─────────────────────────────
+desktop.ini
+ehthumbs.db
+
+# ── Temporary / backup files ──────────────────
+*.bak
+*.tmp
+*.orig
+*.rej
+
+# ── Local notes / draft dokumen ───────────────
+# Uncomment baris di bawah jika ingin mengabaikan file konteks lokal
+# konteks.md
