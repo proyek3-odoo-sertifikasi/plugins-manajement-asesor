@@ -197,7 +197,7 @@ from . import lsp_penugasan_line
 Buat model jadwal ujian sebagai referensi konteks penugasan. **Jika modul penjadwalan sudah ada, gunakan `_inherit` bukan `_name` baru.**
 
 Field-field wajib yang harus ada di model ini:
-- `name`: Char (nama/kode jadwal, required)
+- `name`: Char, auto-generate sequence format `JDW/YYYY/MM/XXX`, `copy=False`, readonly di view
 - `skema_id`: Many2one ke `lsp.skema.sertifikasi` (atau Char sementara jika modul belum ada)
 - `tanggal_mulai`: Datetime (required)
 - `tanggal_selesai`: Datetime (required)
@@ -210,7 +210,8 @@ Field-field wajib yang harus ada di model ini:
 - `jumlah_asesor_tersedia`: Integer (computed: count asesor unik dari `penugasan_ids.penugasan_line_ids`)
 - `is_kuota_cukup`: Boolean (computed: `jumlah_asesor_tersedia >= jumlah_asesor_dibutuhkan`)
 
-Tambahkan button `action_mulai_penugasan` yang hanya aktif saat `state == 'terjadwal'`, yang membuat record `lsp.penugasan.asesor` baru terkait jadwal ini dan mengubah state ke `'penugasan'`.
+Tambahkan tombol `action_set_terjadwal` untuk mengubah status dari `'draft'` menjadi `'terjadwal'`.
+Tambahkan button `action_mulai_penugasan` yang aktif saat `state in ('terjadwal', 'penugasan')`, yang membuat record `lsp.penugasan.asesor` baru terkait jadwal ini dan mengubah state ke `'penugasan'`.
 
 ---
 
@@ -488,6 +489,15 @@ Buat:
 <!-- code: lsp.penugasan.asesor -->
 <!-- prefix: PENUGASAN/%(year)s/%(month)s/ -->
 <!-- padding: 4 -->
+```
+
+**Sequence** untuk auto-numbering jadwal ujian:
+```xml
+<!-- id: seq_lsp_jadwal_ujian -->
+<!-- name: Jadwal Ujian LSP -->
+<!-- code: lsp.jadwal.ujian -->
+<!-- prefix: JDW/%(year)s/%(month)s/ -->
+<!-- padding: 3 -->
 ```
 
 **Mail Template** untuk notifikasi ke Asesor:

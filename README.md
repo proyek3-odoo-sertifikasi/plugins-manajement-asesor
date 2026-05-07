@@ -19,6 +19,12 @@ Modul **plugins_manajement_asesor** adalah esktensi custom Odoo 19 untuk Sistem 
 - [Kredit](#-kredit)
 - [Lisensi](#-lisensi)
 
+## 📚 Dokumentasi Lengkap
+- [Panduan Instalasi & Pengujian](INSTALLATION.md)
+- [Panduan Penggunaan Demo Data](DEMO_DATA.md)
+- [Konteks & Aturan Bisnis](CONTEXT.md)
+- [Catatan Perubahan](CHANGELOG.md)
+
 ## ✨ Fitur Utama
 
 - **Distribusi Otomatis (Round-Robin)**: Mendistribusikan Asesi kepada Asesor secara otomatis, adil, dan merata untuk sebuah jadwal pengujian.
@@ -50,7 +56,7 @@ Modul **plugins_manajement_asesor** adalah esktensi custom Odoo 19 untuk Sistem 
 5. Buka Menu **Apps** > Klik **Update Apps List**.
 6. Cari `LSP - Penugasan Asesor` lalu klik **Activate** / **Install**.
 
-*(Untuk detail setup instalasi environment bisa dilihat pada referensi `README_INSTALASI.md`)*
+*(Untuk detail setup instalasi environment bisa dilihat pada referensi [INSTALLATION.md](INSTALLATION.md))*
 
 ## 🔄 Alur Kerja (Workflow)
 

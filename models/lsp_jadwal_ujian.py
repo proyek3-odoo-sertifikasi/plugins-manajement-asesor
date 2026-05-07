@@ -1,6 +1,7 @@
 import math
 
 from odoo import api, fields, models, _
+# pyrefly: ignore [missing-import]
 from odoo.exceptions import UserError, ValidationError
 
 
@@ -13,6 +14,7 @@ class LspJadwalUjian(models.Model):
         string='Nama/Kode Jadwal',
         required=True,
         copy=False,
+        default=lambda self: _('New'),
     )
     # TODO: replace with Many2one ke lsp.skema.sertifikasi when module is ready
     skema_id = fields.Char(
@@ -94,6 +96,13 @@ class LspJadwalUjian(models.Model):
         compute='_compute_is_kuota_cukup',
     )
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('name', _('New')) == _('New'):
+                vals['name'] = self.env['ir.sequence'].next_by_code('lsp.jadwal.ujian') or _('New')
+        return super(LspJadwalUjian, self).create(vals_list)
+
     @api.depends('asesi_ids')
     def _compute_jumlah_asesi(self):
         for record in self:
@@ -146,14 +155,33 @@ class LspJadwalUjian(models.Model):
                     _('Tanggal selesai tidak boleh lebih awal dari tanggal mulai.')
                 )
 
+    def action_set_terjadwal(self):
+        """Mengubah status jadwal menjadi terjadwal."""
+        for record in self:
+            if record.state == 'draft':
+                record.state = 'terjadwal'
+
     def action_mulai_penugasan(self):
         """Membuat record penugasan baru terkait jadwal ini dan mengubah state."""
+        import datetime
         self.ensure_one()
-        if self.state != 'terjadwal':
-            raise UserError(_('Penugasan hanya dapat dimulai dari jadwal berstatus "Terjadwal".'))
+        if self.state not in ['terjadwal', 'penugasan']:
+            raise UserError(_('Penugasan hanya dapat dimulai dari jadwal berstatus "Terjadwal" atau "Proses Penugasan".'))
+
+        # Cari tanggal penugasan yang tersedia
+        existing_penugasan = self.env['lsp.penugasan.asesor'].search([('jadwal_id', '=', self.id)])
+        existing_dates = [p.tanggal_penugasan for p in existing_penugasan if p.tanggal_penugasan]
+        
+        target_date = self.tanggal_mulai or fields.Date.today()
+        while target_date in existing_dates:
+            target_date += datetime.timedelta(days=1)
+            
+        if self.tanggal_selesai and target_date > self.tanggal_selesai:
+            raise UserError(_('Semua hari dalam rentang jadwal ini sudah memiliki penugasan.'))
 
         penugasan = self.env['lsp.penugasan.asesor'].create({
             'jadwal_id': self.id,
+            'tanggal_penugasan': target_date,
         })
         self.state = 'penugasan'
 

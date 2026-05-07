@@ -91,6 +91,23 @@ def _check_waktu(self):
             raise ValidationError(_('Tanggal selesai tidak boleh lebih awal dari tanggal mulai.'))
 ```
 
+### 1.4 Penomoran Kode Jadwal Otomatis
+
+**Sebelum:**
+Field `name` diisi manual oleh user.
+
+**Sesudah:**
+Field `name` dibuat _Read-Only_ di *view* dan di-*generate* otomatis oleh *sequence* Odoo dengan format `JDW/%(year)s/%(month)s/XXX` (contoh: `JDW/2026/05/001`) saat record disave (melalui *override* fungsi `create`).
+
+### 1.5 Perbaikan Alur Status Jadwal (Workflow)
+
+**Masalah:** 
+Sebelumnya tidak ada tombol untuk mengubah status jadwal dari `draft` ke `terjadwal`. Selain itu, tombol `Mulai Penugasan Asesor` menghilang setelah penugasan pertama dibuat karena status berubah menjadi `penugasan`.
+
+**Solusi:**
+1. Menambahkan tombol **Konfirmasi Jadwal** (`action_set_terjadwal`) untuk memajukan status dari `draft` menjadi `terjadwal`.
+2. Mengubah visibilitas tombol **Mulai Penugasan Asesor** (`action_mulai_penugasan`) agar tetap muncul baik saat status `terjadwal` maupun `penugasan` (`invisible="state not in ('terjadwal', 'penugasan')"`). Hal ini selaras dengan aturan bisnis di mana 1 jadwal boleh memiliki lebih dari 1 penugasan (untuk hari yang berbeda).
+
 ---
 
 ## 2. Model Baru: `lsp_slot_waktu.py`

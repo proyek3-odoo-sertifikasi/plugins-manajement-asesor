@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- ============================================== -->
+        <!-- 1. DATA DUMMY ASESOR                           -->
+        <!-- ============================================== -->
+        <record id="demo_asesor_1" model="res.users">
+            <field name="name">Asesor Joko</field>
+            <field name="login">asesor_joko</field>
+            <field name="password">admin</field>
+        </record>
+        
+        <record id="demo_asesor_2" model="res.users">
+            <field name="name">Asesor Rina</field>
+            <field name="login">asesor_rina</field>
+            <field name="password">admin</field>
+        </record>
+
+        <!-- Tambahkan user ke group asesor -->
+        <record id="plugins_manajement_asesor.group_asesor" model="res.groups">
+            <field name="users" eval="[(4, ref('demo_asesor_1')), (4, ref('demo_asesor_2'))]"/>
+        </record>
+
+        <!-- ============================================== -->
+        <!-- 2. DATA DUMMY ASESI (25 Orang)                 -->
+        <!-- ============================================== -->
+        <record id="demo_asesi_1" model="res.partner"><field name="name">Asesi 01</field><field name="email">asesi01@test.com</field></record>
+        <record id="demo_asesi_2" model="res.partner"><field name="name">Asesi 02</field><field name="email">asesi02@test.com</field></record>
+        <record id="demo_asesi_3" model="res.partner"><field name="name">Asesi 03</field><field name="email">asesi03@test.com</field></record>
+        <record id="demo_asesi_4" model="res.partner"><field name="name">Asesi 04</field><field name="email">asesi04@test.com</field></record>
+        <record id="demo_asesi_5" model="res.partner"><field name="name">Asesi 05</field><field name="email">asesi05@test.com</field></record>
+        <record id="demo_asesi_6" model="res.partner"><field name="name">Asesi 06</field><field name="email">asesi06@test.com</field></record>
+        <record id="demo_asesi_7" model="res.partner"><field name="name">Asesi 07</field><field name="email">asesi07@test.com</field></record>
+        <record id="demo_asesi_8" model="res.partner"><field name="name">Asesi 08</field><field name="email">asesi08@test.com</field></record>
+        <record id="demo_asesi_9" model="res.partner"><field name="name">Asesi 09</field><field name="email">asesi09@test.com</field></record>
+        <record id="demo_asesi_10" model="res.partner"><field name="name">Asesi 10</field><field name="email">asesi10@test.com</field></record>
+        <record id="demo_asesi_11" model="res.partner"><field name="name">Asesi 11</field><field name="email">asesi11@test.com</field></record>
+        <record id="demo_asesi_12" model="res.partner"><field name="name">Asesi 12</field><field name="email">asesi12@test.com</field></record>
+        <record id="demo_asesi_13" model="res.partner"><field name="name">Asesi 13</field><field name="email">asesi13@test.com</field></record>
+        <record id="demo_asesi_14" model="res.partner"><field name="name">Asesi 14</field><field name="email">asesi14@test.com</field></record>
+        <record id="demo_asesi_15" model="res.partner"><field name="name">Asesi 15</field><field name="email">asesi15@test.com</field></record>
+        <record id="demo_asesi_16" model="res.partner"><field name="name">Asesi 16</field><field name="email">asesi16@test.com</field></record>
+        <record id="demo_asesi_17" model="res.partner"><field name="name">Asesi 17</field><field name="email">asesi17@test.com</field></record>
+        <record id="demo_asesi_18" model="res.partner"><field name="name">Asesi 18</field><field name="email">asesi18@test.com</field></record>
+        <record id="demo_asesi_19" model="res.partner"><field name="name">Asesi 19</field><field name="email">asesi19@test.com</field></record>
+        <record id="demo_asesi_20" model="res.partner"><field name="name">Asesi 20</field><field name="email">asesi20@test.com</field></record>
+        <record id="demo_asesi_21" model="res.partner"><field name="name">Asesi 21</field><field name="email">asesi21@test.com</field></record>
+        <record id="demo_asesi_22" model="res.partner"><field name="name">Asesi 22</field><field name="email">asesi22@test.com</field></record>
+        <record id="demo_asesi_23" model="res.partner"><field name="name">Asesi 23</field><field name="email">asesi23@test.com</field></record>
+        <record id="demo_asesi_24" model="res.partner"><field name="name">Asesi 24</field><field name="email">asesi24@test.com</field></record>
+        <record id="demo_asesi_25" model="res.partner"><field name="name">Asesi 25</field><field name="email">asesi25@test.com</field></record>
+
+        <!-- ============================================== -->
+        <!-- 3. DATA DUMMY JADWAL UJIAN                     -->
+        <!-- ============================================== -->
+        <record id="demo_jadwal_ujian_skenario_1" model="lsp.jadwal.ujian">
+            <field name="name">Ujian Web Developer (Skenario 25 Asesi)</field>
+            <!-- Kita ambil tanggal yang lewat dari hari ini sedikit atau jauh di depan -->
+            <field name="tanggal_mulai">2026-10-10 08:00:00</field>
+            <field name="tanggal_selesai">2026-10-10 16:00:00</field>
+            <field name="state">terjadwal</field>
+            <field name="asesi_ids" eval="[(6, 0, [
+                ref('demo_asesi_1'), ref('demo_asesi_2'), ref('demo_asesi_3'), ref('demo_asesi_4'), ref('demo_asesi_5'),
+                ref('demo_asesi_6'), ref('demo_asesi_7'), ref('demo_asesi_8'), ref('demo_asesi_9'), ref('demo_asesi_10'),
+                ref('demo_asesi_11'), ref('demo_asesi_12'), ref('demo_asesi_13'), ref('demo_asesi_14'), ref('demo_asesi_15'),
+                ref('demo_asesi_16'), ref('demo_asesi_17'), ref('demo_asesi_18'), ref('demo_asesi_19'), ref('demo_asesi_20'),
+                ref('demo_asesi_21'), ref('demo_asesi_22'), ref('demo_asesi_23'), ref('demo_asesi_24'), ref('demo_asesi_25')
+            ])]"/>
+        </record>
+
+    </data>
+</odoo>

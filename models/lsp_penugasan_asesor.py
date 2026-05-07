@@ -1,6 +1,7 @@
 import math
 
 from odoo import api, fields, models, _
+# pyrefly: ignore [missing-import]
 from odoo.exceptions import UserError, ValidationError
 
 
@@ -97,6 +98,25 @@ class LspPenugasanAsesor(models.Model):
                         jadwal.name,
                         jadwal.tanggal_mulai.strftime('%d %B %Y'),
                         jadwal.tanggal_selesai.strftime('%d %B %Y'),
+                    )
+                )
+
+    @api.constrains('jadwal_id', 'tanggal_penugasan')
+    def _check_unique_jadwal_tanggal(self):
+        for record in self:
+            if not record.jadwal_id or not record.tanggal_penugasan:
+                continue
+            duplikat = self.search([
+                ('jadwal_id', '=', record.jadwal_id.id),
+                ('tanggal_penugasan', '=', record.tanggal_penugasan),
+                ('id', '!=', record.id)
+            ])
+            if duplikat:
+                raise ValidationError(
+                    _('Sudah ada penugasan untuk jadwal "%s" pada tanggal %s. '
+                      'Satu jadwal hanya boleh memiliki satu penugasan per hari.') % (
+                        record.jadwal_id.name,
+                        record.tanggal_penugasan.strftime('%d %B %Y')
                     )
                 )
 
@@ -199,6 +219,19 @@ class LspPenugasanAsesor(models.Model):
                     self.jumlah_asesor_dibutuhkan, self.total_asesor
                 )
             )
+
+        # Validasi field baris penugasan (pitstop dan asesi)
+        for line in self.penugasan_line_ids:
+            if not line.ruangan:
+                raise UserError(
+                    _('Ruangan (Pitstop) untuk asesor %s belum diisi! '
+                      'Pastikan semua asesor memiliki ruangan sebelum penugasan dikunci.') % line.asesor_id.name
+                )
+            if not line.asesi_ids:
+                raise UserError(
+                    _('Asesor %s belum ditugaskan untuk menguji asesi apapun. '
+                      'Silakan lakukan Distribusi & Validasi Otomatis terlebih dahulu.') % line.asesor_id.name
+                )
 
         self.state = 'dikunci'
 
